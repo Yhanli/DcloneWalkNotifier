@@ -111,7 +111,7 @@ class DcloneDB:
     def is_existing_status(self, status):
         c = self.c
         c.execute(
-            f"SELECT * FROM status WHERE region=? and hc=? and ladder=? and progress=? ORDER BY timestamp DESC",
+            f"SELECT * FROM status WHERE region=? and hc=? and ladder=? ORDER BY timestamp DESC",
             (status.region, status.hc, status.ladder, status.progress),
         )
 
