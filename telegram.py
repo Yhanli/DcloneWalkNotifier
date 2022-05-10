@@ -3,6 +3,7 @@ from environs import Env
 import traceback
 from model import UserController
 import time
+import math
 
 env = Env()
 env.read_env()
@@ -23,10 +24,34 @@ def greet(message):
 def start(message):
     print(message)
     user = UserController(message.chat.id)
-    bot.send_message(
-        message.chat.id,
-        "You have default to All region , Softcore, Ladder only, and Progress 4,5,6",
-    )
+
+    if user.user.existing:
+        bot.send_message(
+            message.chat.id,
+            "You already in our notification list\n\n" + user.user.subscription_str(),
+        )
+    else:
+        user.subscribe_default()
+        bot.send_message(
+            message.chat.id,
+            "You have default to All region , Softcore, Ladder only, and Progress 4,5,6",
+        )
+
+
+@bot.message_handler(commands=["status"])
+def status(message):
+    print(message.chat.id, message.text)
+    user = UserController(message.chat.id)
+    if user.user.existing:
+        bot.send_message(
+            message.chat.id,
+            "Your current subscription\n\n" + user.user.subscription_str(),
+        )
+    else:
+        bot.send_message(
+            message.chat.id,
+            "You dont have any subscription with us, send /start to subscribe",
+        )
 
 
 @bot.message_handler(commands=["unsubscribe"])
@@ -63,20 +88,29 @@ def remove(message):
 def send_notification(status):
     users = status.get_users_subbed()
     status = status.status
-    print(status.print_json())
-    message = f"""
+    rounds = int(status.progress) - 4
+    if rounds < 0:
+        rounds = 1
+    else:
+        rounds = int(status.progress) - 3
+
+    # print(rounds)
+    for i in range(rounds):
+        # print(i)
+        print(status.print_json())
+        message = f"""
 {status.region_str} / {status.ladder_str} / {status.hc_str}
 {status.progress_str}
 """
-    bot.send_message("@DcloneWalkGroup", message)
+        bot.send_message("@DcloneWalkGroup", message)
 
-    count = 0
-    for user in users:
-        bot.send_message(user, message)
-        count += 1
-        if count >= 30:
-            time.sleep(1)
-            count = 0
+        count = 0
+        for user in users:
+            bot.send_message(user, message)
+            count += 1
+            if count >= 30:
+                time.sleep(1)
+                count = 0
 
 
 if __name__ == "__main__":

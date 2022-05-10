@@ -1,9 +1,26 @@
 from dataclasses import dataclass
 from datetime import datetime
+from email import message
+from email.errors import MessageError
 import json
 from database import *
 import copy
 import re
+
+
+attr = {
+    "region": {"1": "America", "2": "Europe", "3": "Asia"},
+    "ladder": {"1": "Ladder", "2": "Non-Ladder"},
+    "hc": {"1": "Hardcode", "2": "Softcore"},
+    "progress": {
+        "1": "1. Terror gazes upon Sanctuary.",
+        "2": "2. Terror approaches Sanctuary.",
+        "3": "3. Terror begins to form within Sanctuary.",
+        "4": "4. Terror spreads across Sanctuary.",
+        "5": "5. Terror is about to be unleashed upon Sanctuary.",
+        "6": "6. Diablo has invaded Sanctuary.",
+    },
+}
 
 
 class User:
@@ -23,6 +40,20 @@ class User:
         item = json.dumps(item, ensure_ascii=False, sort_keys=True, indent=4)
         print(item)
         return item
+
+    def subscription_str(self):
+        region = ", ".join(map_attr(self.region, "region"))
+        hc = ", ".join(map_attr(self.hc, "hc"))
+        ladder = ", ".join(map_attr(self.ladder, "ladder"))
+        progress = self.progress.replace("|", ", ")
+        message = f"""Region: {region}\nCoreness: {hc}\nLadder: {ladder}\nProgress: {progress}"""
+        print(message)
+        return message
+
+
+def map_attr(items, attr_name):
+    items = items.split("|")
+    return [attr[attr_name][item] for item in items]
 
 
 def append_db_string(original, new):
@@ -50,9 +81,7 @@ class UserController:
 
         self.user.existing = self.database.is_existing_user(chat_id)
 
-        if not self.user.existing:
-            self.subscribe_default()
-        else:
+        if self.user.existing:
             self.sync_from_db()
 
     def sync_from_db(self):
@@ -72,71 +101,63 @@ class UserController:
         self.database.delete_user(self.user.chat_id)
 
     def update_user(self, message):
-        ret_message = "Not Valid"
+        ret_message = ["Not Valid"]
+
         if "/add" in message:
             print("add stuff")
             if "hardcore" in message:
                 self.user.hc = append_db_string(self.user.hc, "1")
-                ret_message = f"subscribed to hardcore"
+                ret_message += [f"subscribed to hardcore"]
 
             if "softcore" in message:
                 self.user.hc = append_db_string(self.user.hc, "2")
-                ret_message = f"subscribed to softcore"
+                ret_message += [f"subscribed to softcore"]
 
-            if "ladder" in message:
+            if " ladder" in message:
                 self.user.ladder = append_db_string(self.user.ladder, "1")
-                ret_message = f"subscribed to ladder"
-
+                ret_message += [f"subscribed to ladder"]
             if "non-ladder" in message:
                 self.user.ladder = append_db_string(self.user.ladder, "2")
-                ret_message = f"subscribed to non-ladder"
+                ret_message += [f"subscribed to non-ladder"]
 
             if "progress" in message:
-                num = re.sub("[^0-9]", "", str(message))
-                self.user.progress = append_db_string(self.user.progress, num)
-                ret_message = f"subscribed to progress {num}"
+                nums = re.sub("[^0-9]", "", str(message))
+                for num in nums:
+                    self.user.progress = append_db_string(self.user.progress, num)
+                    ret_message += [f"subscribed to progress {num}"]
 
         if "/remove" in message:
             print("remove stuff")
             if "hardcore" in message:
                 self.user.hc = remove_db_string(self.user.hc, "1")
-                ret_message = f"unsubscribed from hardcore"
+                ret_message += [f"unsubscribed from hardcore"]
 
             if "softcore" in message:
                 self.user.hc = remove_db_string(self.user.hc, "2")
-                ret_message = f"unsubscribed from softcore"
+                ret_message += [f"unsubscribed from softcore"]
 
-            if "ladder" in message:
+            if " ladder" in message:
                 self.user.ladder = remove_db_string(self.user.ladder, "1")
-                ret_message = f"unsubscribed from ladder"
+                ret_message += [f"unsubscribed from ladder"]
 
             if "non-ladder" in message:
                 self.user.ladder = remove_db_string(self.user.ladder, "2")
-                ret_message = f"unsubscribed from non-ladder"
+                ret_message += [f"unsubscribed from non-ladder"]
 
             if "progress" in message:
-                num = re.sub("[^0-9]", "", str(message))
-                self.user.progress = remove_db_string(self.user.progress, num)
-                ret_message = f"unsubscribed from progress {num}"
+                nums = re.sub("[^0-9]", "", str(message))
+                for num in nums:
+                    self.user.progress = remove_db_string(self.user.progress, num)
+                    ret_message += [f"unsubscribed from progress {num}"]
+
+        if len(ret_message) > 1:
+            ret_message = "\n".join(ret_message[1:])
+        else:
+            ret_message = "\n".join(ret_message)
 
         self.user_json()
         self.database.update_user(self.user)
         return ret_message
-
-
-attr = {
-    "region": {"1": "America", "2": "Europe", "3": "Asia"},
-    "ladder": {"1": "Ladder", "2": "Non-Ladder"},
-    "hc": {"1": "Hardcode", "2": "Softcore"},
-    "progress": {
-        "1": "1. Terror gazes upon Sanctuary.",
-        "2": "2. Terror approaches Sanctuary.",
-        "3": "3. Terror begins to form within Sanctuary.",
-        "4": "4. Terror spreads across Sanctuary.",
-        "5": "5. Terror is about to be unleashed upon Sanctuary.",
-        "6": "6. Diablo has invaded Sanctuary.",
-    },
-}
 
 
 class Status:

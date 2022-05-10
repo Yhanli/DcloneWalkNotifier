@@ -14,9 +14,11 @@ database = DcloneDB()
 
 #%%
 for i in range(3):
+    print("request dclone data")
     res = requests.get(url)
     data = json.loads(res.text)
 
+    print("process dclone data")
     for record in data:
         status = StatusController(record)
         if status.status_not_exist():
