@@ -112,7 +112,7 @@ class DcloneDB:
         c = self.c
         c.execute(
             f"SELECT * FROM status WHERE region=? and hc=? and ladder=? ORDER BY timestamp DESC",
-            (status.region, status.hc, status.ladder, status.progress),
+            (status.region, status.hc, status.ladder),
         )
 
         old_status = c.fetchone()
