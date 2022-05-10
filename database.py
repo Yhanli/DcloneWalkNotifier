@@ -149,7 +149,7 @@ class DcloneDB:
                         hc integer NOT NULL,
                         ladder integer NOT NULL,
                         progress integer NOT NULL,
-                        timestamp integer NOT NULL,
+                        timestamp integer NOT NULL
                     )
             """
             )
