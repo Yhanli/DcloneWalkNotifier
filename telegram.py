@@ -28,18 +28,44 @@ def start(message):
     if user.user.existing:
         bot.send_message(
             message.chat.id,
-            "You already in our notification list\n\n" + user.user.subscription_str(),
+            "You already in our notification list\n\n"
+            + user.user.subscription_str()
+            + """\n
+Thanks you for using Yhanl's DClone Bot
+
+/me - to show what your subcribed to
+/status - to show status relate to your subscription
+/status all - to show all dclone status
+
+Support single or multiple item in the sametime
+/add xxx - to add subscription eg "/add NA EU progress 456 hardcore"
+/remove xxx - to remove subscription eg "/remove NA EU progress 456 hardcore"
+
+Keep your notification active to not miss a walk. Enjoy!!
+""",
         )
     else:
         user.subscribe_default()
         bot.send_message(
             message.chat.id,
-            "You have default to All region , Softcore, Ladder only, and Progress 4,5,6",
+            """Thanks you for using Yhanl's DClone Bot
+
+/me - to show what your subcribed to
+/status - to show status relate to your subscription
+/status all - to show all dclone status
+
+Support single or multiple item in the sametime
+/add xxx - to add subscription eg "/add NA EU progress 456 hardcore"
+/remove xxx - to remove subscription eg "/remove NA EU progress 456 hardcore"
+
+Keep your notification active to not miss a walk. Enjoy!!\n\n
+"""
+            + "You have defaulted to All region , Softcore, Ladder only, and Progress 4,5,6",
         )
 
 
-@bot.message_handler(commands=["status"])
-def status(message):
+@bot.message_handler(commands=["me"])
+def me(message):
     print(message.chat.id, message.text)
     user = UserController(message.chat.id)
     if user.user.existing:
@@ -51,6 +77,27 @@ def status(message):
         bot.send_message(
             message.chat.id,
             "You dont have any subscription with us, send /start to subscribe",
+        )
+
+
+@bot.message_handler(commands=["status"])
+def status(message):
+    print(message.chat.id, message.text)
+    user = UserController(message.chat.id)
+    if user.user.existing and "all" not in message.text:
+        bot.send_message(
+            message.chat.id,
+            "base on your current subscription\n\n" + user.related_status(),
+        )
+    else:
+        bot.send_message(
+            message.chat.id,
+            (
+                "You dont have any subscription with us, showing all status\n\n"
+                if not user.user.existing
+                else "Showing all status\n\n"
+            )
+            + user.related_status(all=True),
         )
 
 

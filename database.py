@@ -100,6 +100,14 @@ class DcloneDB:
         )
         self.DB.commit()
 
+    def find_status(self, region, hc, ladder):
+        c = self.c
+        c.execute(
+            f"SELECT * FROM status WHERE region=? and hc=? and ladder=? ORDER BY timestamp DESC",
+            (region, hc, ladder),
+        )
+        return c.fetchone()
+
     def is_existing_status(self, status):
         c = self.c
         c.execute(

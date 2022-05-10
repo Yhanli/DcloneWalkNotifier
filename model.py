@@ -53,11 +53,20 @@ class User:
 
 def map_attr(items, attr_name):
     items = items.split("|")
+    try:
+        items.remove("")
+    except:
+        pass
     return [attr[attr_name][item] for item in items]
 
 
 def append_db_string(original, new):
     array = original.split("|")
+    try:
+        array.remove("")
+    except:
+        pass
+
     if new not in array:
         array.append(new)
     array.sort()
@@ -67,6 +76,11 @@ def append_db_string(original, new):
 
 def remove_db_string(original, new):
     array = original.split("|")
+    try:
+        array.remove("")
+    except:
+        pass
+
     if new in array:
         array.remove(new)
     array.sort()
@@ -102,9 +116,21 @@ class UserController:
 
     def update_user(self, message):
         ret_message = ["Not Valid"]
-
+        message = message.lower()
         if "/add" in message:
             print("add stuff")
+            if " na" in message or " us" in message or "america" in message:
+                self.user.region = append_db_string(self.user.region, "1")
+                ret_message += [f"subscribed to America Region"]
+
+            if " eu" in message or "europe" in message:
+                self.user.region = append_db_string(self.user.region, "2")
+                ret_message += [f"subscribed to Europe Region"]
+
+            if "asia" in message:
+                self.user.region = append_db_string(self.user.region, "3")
+                ret_message += [f"subscribed to Asia Region"]
+
             if "hardcore" in message:
                 self.user.hc = append_db_string(self.user.hc, "1")
                 ret_message += [f"subscribed to hardcore"]
@@ -128,6 +154,19 @@ class UserController:
 
         if "/remove" in message:
             print("remove stuff")
+
+            if " na" in message or " us" in message or "america" in message:
+                self.user.region = remove_db_string(self.user.region, "1")
+                ret_message += [f"unsubscribed from America Region"]
+
+            if " eu" in message or "europe" in message:
+                self.user.region = remove_db_string(self.user.region, "2")
+                ret_message += [f"unsubscribed from Europe Region"]
+
+            if "asia" in message:
+                self.user.region = remove_db_string(self.user.region, "3")
+                ret_message += [f"unsubscribed from Asia Region"]
+
             if "hardcore" in message:
                 self.user.hc = remove_db_string(self.user.hc, "1")
                 ret_message += [f"unsubscribed from hardcore"]
@@ -158,6 +197,32 @@ class UserController:
         self.user_json()
         self.database.update_user(self.user)
         return ret_message
+
+    def related_status(self, all=False):
+        user = self.user
+        if not all:
+            regions = user.region.split("|")
+            hc = user.hc.split("|")
+            ladder = user.ladder.split("|")
+        else:
+            regions = attr["region"].keys()
+            hc = attr["hc"].keys()
+            ladder = attr["ladder"].keys()
+
+        message = []
+        for climb in ladder:
+            for core in hc:
+                for region in regions:
+                    result = self.database.find_status(region, core, climb)
+                    if result:
+                        region_str = attr["region"][str(result["region"])]
+                        hc_str = attr["hc"][str(result["hc"])]
+                        ladder_str = attr["ladder"][str(result["ladder"])]
+                        message.append(
+                            f"""{result['progress']}/6 {region_str} / {hc_str} / {ladder_str} """
+                        )
+        message = "\n".join(message)
+        return message
 
 
 class Status:
@@ -206,3 +271,8 @@ class StatusController:
 
     def get_users_subbed(self):
         return self.database.get_subscribed_users(self.status)
+
+
+if __name__ == "__main__":
+    user = UserController("")
+    user.related_status()

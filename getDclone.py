@@ -8,7 +8,7 @@ from datetime import datetime
 import time
 
 
-url = "https://diablo2.io/dclone_api.php?sk=p&sd=d&ladder=1&hc=2&plat_pc=1&plat_switch=0&plat_playstation=0&plat_xbox=0&region=0"
+url = "https://diablo2.io/dclone_api.php"
 
 database = DcloneDB()
 
