@@ -1,0 +1,1 @@
+* * * * * cd /home/yhanl/DcloneWalkNotifier && /home/yhanl/.local/bin/pipenv run python getDclone.py >> /srv/logs/DClone.txt 2>&1

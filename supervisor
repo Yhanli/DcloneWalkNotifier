@@ -1,0 +1,8 @@
+[program:TelegramDclone]
+directory=/home/yhanl/DcloneWalkNotifier
+command=pipenv run python telegram.py
+
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/gunicorn/TelegramDclone.err.log
+stdout_logfile=/var/log/gunicorn/TelegramDclone.out.log
