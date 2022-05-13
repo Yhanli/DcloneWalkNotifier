@@ -1,6 +1,6 @@
 from datetime import datetime
 
 
-def write(self, *args):
+def write(*args, **kwargs):
     print(f"\n************ {datetime.now()} ************")
-    print(" ".join(s for s in args))
+    print(" ".join(str(s) for s in args))
