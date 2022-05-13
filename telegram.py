@@ -41,6 +41,8 @@ Support single or multiple item in the sametime
 /add xxx - to add subscription eg "/add NA EU progress 456 hardcore"
 /remove xxx - to remove subscription eg "/remove NA EU progress 456 hardcore"
 
+/unsubscribe - to remove yourself from notification list completely
+
 Keep your notification active to not miss a walk. Enjoy!!
 """,
         )
@@ -57,6 +59,8 @@ Keep your notification active to not miss a walk. Enjoy!!
 Support single or multiple item in the sametime
 /add xxx - to add subscription eg "/add NA EU progress 456 hardcore"
 /remove xxx - to remove subscription eg "/remove NA EU progress 456 hardcore"
+
+/unsubscribe - to remove yourself from notification list completely
 
 Keep your notification active to not miss a walk. Enjoy!!\n\n
 """
