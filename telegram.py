@@ -5,12 +5,17 @@ from model import UserController
 import time
 import math
 
+import helperfunction
+
 env = Env()
 env.read_env()
 
 API_KEY = env("API_KEY")
 print(API_KEY)
 bot = telebot.TeleBot(API_KEY)
+
+
+print = helperfunction.write
 
 
 @bot.message_handler(commands=["Greet"])
@@ -20,49 +25,60 @@ def greet(message):
     bot.send_message(message.chat.id, "hey, how is it going - no reply")
 
 
+@bot.message_handler(commands=["help"])
+@bot.message_handler(commands=["h"])
 @bot.message_handler(commands=["start"])
 def start(message):
     print(message)
     user = UserController(message.chat.id)
-
-    if user.user.existing:
-        bot.send_message(
-            message.chat.id,
-            "You already in our notification list\n\n"
-            + user.user.subscription_str()
-            + """\n
-Thanks you for using Yhanl's DClone Bot
+    help_message = """
 
 /me - to show what your subcribed to
 /status - to show status relate to your subscription
 /status all - to show all dclone status
 
-Support single or multiple item in the sametime
-/add xxx - to add subscription eg "/add NA EU progress 456 hardcore"
-/remove xxx - to remove subscription eg "/remove NA EU progress 456 hardcore"
+
+"Keywords for add and remove option"
+------------------
+progress 123456 
+(numbers that you want get notify for)
+
+ladder , non-ladder 
+(default to ladder, can /add non-ladder to sub to non-ladder )
+
+NA, America, EU, Europe, Asia
+(default to all)
+
+
+hardcore, softcore
+(default to softcore, /add hardcore and /remove softcore if you want only hardcore)
+
+-------------------
+
+( you dont need to do it in multiple add or remove, you can fit it in a single line)
 
 /unsubscribe - to remove yourself from notification list completely
+( you can unsubscribe anre /start again to reset to default)
 
-Keep your notification active to not miss a walk. Enjoy!!
+/help or /h to show this message again  
+
+Keep your notification active to not miss a walk. Enjoy!!\n\n
+
+"""
+    if user.user.existing:
+        bot.send_message(
+            message.chat.id,
+            "You already in our notification list\n\n"
+            + user.user.subscription_str()
+            + f"""{help_message}
 """,
         )
     else:
         user.subscribe_default()
         bot.send_message(
             message.chat.id,
-            """Thanks you for using Yhanl's DClone Bot
-
-/me - to show what your subcribed to
-/status - to show status relate to your subscription
-/status all - to show all dclone status
-
-Support single or multiple item in the sametime
-/add xxx - to add subscription eg "/add NA EU progress 456 hardcore"
-/remove xxx - to remove subscription eg "/remove NA EU progress 456 hardcore"
-
-/unsubscribe - to remove yourself from notification list completely
-
-Keep your notification active to not miss a walk. Enjoy!!\n\n
+            f"""Thanks you for using Yhanl's DClone Bot
+{help_message}
 """
             + "You have defaulted to All region , Softcore, Ladder only, and Progress 4,5,6",
         )

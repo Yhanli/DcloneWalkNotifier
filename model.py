@@ -46,7 +46,26 @@ class User:
         hc = ", ".join(map_attr(self.hc, "hc"))
         ladder = ", ".join(map_attr(self.ladder, "ladder"))
         progress = self.progress.replace("|", ", ")
-        message = f"""Region: {region}\nCoreness: {hc}\nLadder: {ladder}\nProgress: {progress}"""
+
+        warning = ""
+
+        if len(region) <= 0:
+            region = "none, /add NA/EU/ASIA to add one"
+            warning = "!!!! none status will stop app sending you message"
+
+        if len(hc) <= 0:
+            hc = "none, /add hardcore/softcare to add one"
+            warning = "none status will stop app sending you message"
+
+        if len(ladder) <= 0:
+            ladder = "none, /add ladder/non-ladder to add one"
+            warning = "!!!! none status will stop app sending you message"
+
+        if len(progress) <= 0:
+            progress = "none, /add progress 1/2/3/4/5/6 to add one"
+            warning = "none status will stop app sending you message"
+
+        message = f"""Region: {region}\nCoreness: {hc}\nLadder: {ladder}\nProgress: {progress} \n\n{warning}"""
         print(message)
         return message
 
