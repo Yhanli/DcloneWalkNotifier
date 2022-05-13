@@ -1,2 +1,2 @@
-sudo git pull
+git pull
 sudo supervisorctl reload

@@ -17,21 +17,7 @@ bot = telebot.TeleBot(API_KEY)
 
 print = helperfunction.write
 
-
-@bot.message_handler(commands=["Greet"])
-def greet(message):
-    print(message)
-    bot.reply_to(message, "hey, how is it going")
-    bot.send_message(message.chat.id, "hey, how is it going - no reply")
-
-
-@bot.message_handler(commands=["help"])
-@bot.message_handler(commands=["h"])
-@bot.message_handler(commands=["start"])
-def start(message):
-    print(message)
-    user = UserController(message.chat.id)
-    help_message = """
+help_message = """
 
 /me - to show what your subcribed to
 /status - to show status relate to your subscription
@@ -65,6 +51,31 @@ hardcore, softcore
 Keep your notification active to not miss a walk. Enjoy!!\n\n
 
 """
+
+
+@bot.message_handler(commands=["Greet"])
+def greet(message):
+    print(message)
+    bot.reply_to(message, "hey, how is it going")
+    bot.send_message(message.chat.id, "hey, how is it going - no reply")
+
+
+@bot.message_handler(commands=["h"])
+@bot.message_handler(commands=["help"])
+def help(message):
+    bot.send_message(
+        message.chat.id,
+        f"""Thanks you for using Yhanl's DClone Bot
+    {help_message}
+    """,
+    )
+
+
+@bot.message_handler(commands=["start"])
+def start(message):
+    print(message)
+    user = UserController(message.chat.id)
+
     if user.user.existing:
         bot.send_message(
             message.chat.id,
