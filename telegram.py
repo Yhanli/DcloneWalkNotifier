@@ -3,8 +3,7 @@ from environs import Env
 import traceback
 from model import UserController
 import time
-import math
-
+import sys
 import helperfunction
 
 env = Env()
@@ -185,14 +184,28 @@ def send_notification(status):
         count = 0
         for user in users:
             bot.send_message(user, message)
+            user = UserController(user)
+            user.add_last_notified(status)
             count += 1
             if count >= 30:
                 time.sleep(1)
                 count = 0
 
 
+def admin_msg(message):
+    user = UserController("1234124124124")
+    users = user.get_all_user()
+    for user in users:
+        bot.send_message(user, message)
+
+
 if __name__ == "__main__":
-    try:
-        bot.polling()
-    except:
-        traceback.print_exc()
+
+    if "-m" in str(sys.argv):
+        message = (" ".join(sys.argv[2:])).replace("\\n ", "\n")
+        admin_msg(message)
+    else:
+        try:
+            bot.polling()
+        except:
+            traceback.print_exc()

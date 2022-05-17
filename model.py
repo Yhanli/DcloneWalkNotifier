@@ -30,6 +30,7 @@ class User:
         self.hc = "2"
         self.ladder = "1"
         self.progress = "4|5|6"
+        self.last_notify = "9"
         self.existing = False
 
     # def sync_from_db(self):
@@ -123,6 +124,7 @@ class UserController:
         self.user.hc = user["sub_hc"]
         self.user.ladder = user["sub_ladder"]
         self.user.progress = user["sub_progress"]
+        self.user.last_notify = user["last_notify"]
 
     def subscribe_default(self):
         self.database.put_user(self.user)
@@ -132,6 +134,29 @@ class UserController:
 
     def unsub_user(self):
         self.database.delete_user(self.user.chat_id)
+
+    def add_last_notified(self, status):
+        user = self.user
+
+        notifies_ori = user.last_notify.split("|")
+        notify_pref = f"{status.region}{status.hc}{status.ladder}"  # {status.progress}"
+
+        matched_notify = [_ for _ in notifies_ori if notify_pref in _]
+        tem_notifies = [_ for _ in notifies_ori if notify_pref not in _]
+        matched_notify.append(f"{notify_pref}{status.progress}")
+
+        # set threshhold here, should be less than 6
+        matched_notify = matched_notify[-3:]
+
+        new_notifies = tem_notifies + matched_notify
+
+        new_notifies_str = "|".join(new_notifies)
+        user.last_notify = new_notifies_str
+        # self.user_json()
+        self.database.update_user(user)
+
+    def get_all_user(self):
+        return self.database.get_all_user()
 
     def update_user(self, message):
         ret_message = ["Not Valid"]

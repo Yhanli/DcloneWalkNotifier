@@ -205,12 +205,13 @@ class DcloneDB:
     def update_user(self, user):
         c = self.c
         c.execute(
-            f"UPDATE user SET sub_regions=%s, sub_hc=%s, sub_ladder=%s, sub_progress=%s WHERE chat_id=%s",
+            f"UPDATE user SET sub_regions=%s, sub_hc=%s, sub_ladder=%s, sub_progress=%s, last_notify=%s WHERE chat_id=%s",
             (
                 user.region,
                 user.hc,
                 user.ladder,
                 user.progress,
+                user.last_notify,
                 user.chat_id,
             ),
         )
@@ -225,12 +226,24 @@ class DcloneDB:
 
     def get_subscribed_users(self, status):
         c = self.c
+        print(status.progress)
+        notify = f"{status.region}{status.hc}{status.ladder}{status.progress}"
         c.execute(
             f"""SELECT * FROM user  
                         WHERE sub_regions LIKE "%{status.region}%" 
                         AND sub_hc LIKE "%{status.hc}%" 
                         AND sub_ladder LIKE "%{status.ladder}%" 
                         AND sub_progress LIKE "%{status.progress}%"
+                        AND last_notify NOT LIKE "%{notify}%"
+                    """
+        )
+        users = c.fetchall()
+        return [int(user["chat_id"]) for user in users]
+
+    def get_all_user(self):
+        c = self.c
+        c.execute(
+            f"""SELECT * FROM user  
                     """
         )
         users = c.fetchall()
