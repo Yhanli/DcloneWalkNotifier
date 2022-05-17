@@ -146,7 +146,7 @@ class UserController:
         matched_notify.append(f"{notify_pref}{status.progress}")
 
         # set threshhold here, should be less than 6
-        matched_notify = matched_notify[-3:]
+        matched_notify = matched_notify[-4:]
 
         new_notifies = tem_notifies + matched_notify
 
