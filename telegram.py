@@ -183,7 +183,10 @@ def send_notification(status):
 
         count = 0
         for user in users:
-            bot.send_message(user, message)
+            try:
+                bot.send_message(user, message)
+            except:
+                traceback.print_exc()
             user = UserController(user)
             user.add_last_notified(status)
             count += 1
