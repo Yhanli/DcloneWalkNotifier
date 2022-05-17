@@ -184,6 +184,7 @@ def send_notification(status):
         count = 0
         for user in users:
             try:
+                print("message to ", user)
                 bot.send_message(user, message)
             except:
                 traceback.print_exc()
