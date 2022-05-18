@@ -188,8 +188,9 @@ def send_notification(status):
                 bot.send_message(user, message)
             except:
                 traceback.print_exc()
-            user = UserController(user)
-            user.add_last_notified(status)
+            if i == 0:
+                user = UserController(user)
+                user.add_last_notified(status)
             count += 1
             if count >= 30:
                 time.sleep(1)
